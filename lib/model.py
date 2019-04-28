@@ -47,7 +47,7 @@ class tfidf(object):
         frequency = defaultdict(int)
         for token in clean:
             frequency[token] += 1
-        clean = [token for token in clean if frequency[token] >= 1]
+        clean = [token for token in clean if frequency[token] > 1]
 
         final = [stemmer.stem(word) for word in clean]
         return final
@@ -80,4 +80,12 @@ class tfidf(object):
 
     def predict(self, article):
         ranking = self.get_ranking(article)
-        return self.train_set[ranking[0][0]]['category']
+        categories = [self.train_set[r[0]]['category'] for r in ranking[:30]]
+        freqs = {}
+        for c in categories:
+            if c in freqs:
+                freqs[c] += 1
+            else:
+                freqs[c] = 1
+        result = max(freqs.items(), key=itemgetter(1))[0]
+        return result
