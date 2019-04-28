@@ -47,7 +47,7 @@ class tfidf(object):
         frequency = defaultdict(int)
         for token in clean:
             frequency[token] += 1
-        clean = [token for token in clean if frequency[token] >= 3]
+        clean = [token for token in clean if frequency[token] >= 1]
 
         final = [stemmer.stem(word) for word in clean]
         return final
