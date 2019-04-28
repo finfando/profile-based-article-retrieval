@@ -7,18 +7,8 @@ from nltk.corpus import stopwords
 from nltk.stem import PorterStemmer
 from gensim import corpora, models, similarities
 from operator import itemgetter
+from collections import defaultdict
 
-sample_corpus = [
-                                    "Human machine interface for lab abc computer applications",
-                      "A survey of user opinion of computer system response time",
-                      "The EPS user interface management system",
-                      "System and human system engineering testing of EPS",
-                      "Relation of user perceived response time to error measurement",
-                      "The generation of random binary unordered trees",
-                      "The intersection graph of paths in trees",
-                      "Graph minors IV Widths of trees and well quasi ordering",
-                      "Graph minors A survey"
-                                ]
 class tfidf(object):
     def __init__(self):
         pass
@@ -52,6 +42,13 @@ class tfidf(object):
         stemmer = PorterStemmer()
         tokens = wordpunct_tokenize(doc)
         clean = [token.lower() for token in tokens if token.lower() not in stopset and len(token) > 2]
+
+        # remove rare words
+        frequency = defaultdict(int)
+        for token in clean:
+            frequency[token] += 1
+        clean = [token for token in clean if frequency[token] >= 3]
+
         final = [stemmer.stem(word) for word in clean]
         return final
 
