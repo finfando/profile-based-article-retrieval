@@ -20,3 +20,19 @@ def get_docs(path):
                         text = text+line
                     docs.append(text)
     return docs
+
+def get_articles(path):
+    docs = []
+    for r, d, f in os.walk(path):
+        if len(d) == 0: # reads only directories without subdirectories
+            for file_name in f:
+                file_path = os.path.join(r, file_name)
+                with open(file_path, 'r') as file:
+                    text = ''
+                    for line in file:
+                        text = text+line
+                    docs.append({
+                        'category': r.split('\\')[-1],
+                        'text': text,
+                        })
+    return docs
