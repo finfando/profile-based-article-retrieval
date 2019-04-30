@@ -1,43 +1,32 @@
+import sys
 import pickle
 from lib.data import generate_profiles
 from sklearn.metrics import accuracy_score
 
-n = 5
-topics = [
-    'business',
-    'entertainment',
-    'politics',
-    'sport',
-    'tech',
-]
+article = None
+try:
+    with open(sys.argv[1], 'r') as file:
+        article = file.read().replace('\n', ' ')
+except IndexError:
+    print('Please provide path to file as command line argument.')
 
-profiles = generate_profiles(n, topics)
-tfidf_model = pickle.load(open('models/tfidf_model.pickle', 'rb'))
+if article is not None:
+    n = 5
+    topics = [
+        'business',
+        'entertainment',
+        'politics',
+        'sport',
+        'tech',
+    ]
+    profiles = generate_profiles(n, topics)
+    print(f'Generated {n} profiles.')
+    print(profiles)
 
-print(f'Generated {n} profiles. Started looking for relevant relevant articles. Number of articles to assign: {len(tfidf_model.test_set)}.')
-print(profiles)
+    tfidf_model = pickle.load(open('models/tfidf_model.pickle', 'rb'))
+    result = tfidf_model.predict(article)
+    print('Article classified as category:', result)
 
-tfidf_model = pickle.load(open('models/tfidf_model.pickle', 'rb'))
-true_labels = [a['category'] for a in tfidf_model.test_set]
-predictions = []
-
-# assign articles to categories
-articles_assigned = {}
-for t in topics:
-    articles_assigned[t] = []
-for article in tfidf_model.test_set:
-    title = article['text'].split('\n')[0]
-    result = tfidf_model.predict(article['text'])
-    articles_assigned[result].append(title)
-    predictions.append(result)
-
-# get relevant articles for each user
-for u, topics in profiles.items():
-    print('User:', u)
-    print('Topics:', topics)
-    articles = []
-    for t in topics:
-        articles = articles+articles_assigned[t]
-    print(articles)
-
-print('Accuracy score:', accuracy_score(true_labels, predictions))
+    for u, topics in profiles.items():
+        if result in topics:
+            print('Article will be delivered to user:', u)
